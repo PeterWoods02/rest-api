@@ -3,6 +3,7 @@ import * as lambdanode from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
+import * as apig from "aws-cdk-lib/aws-apigateway";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -25,6 +26,11 @@ export class CdkStack extends cdk.Stack {
       tableName: "Players",
     });
 
+    playersTable.addLocalSecondaryIndex({
+      indexName: "positionIx",
+      sortKey: { name: "position", type: dynamodb.AttributeType.STRING },
+    });
+
     const createTeamFn = new lambdanode.NodejsFunction(this, "CreateTeamFn", {
       architecture: lambda.Architecture.ARM_64,
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -38,7 +44,26 @@ export class CdkStack extends cdk.Stack {
     });
     teamsTable.grantReadWriteData(createTeamFn);
     
+    // REST API 
+    const api = new apig.RestApi(this, "TeamsApi", {
+      description: "demo api",
+      deployOptions: {
+        stageName: "dev",
+      },
+      defaultCorsPreflightOptions: {
+        allowHeaders: ["Content-Type", "X-Amz-Date"],
+        allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
+        allowCredentials: true,
+        allowOrigins: ["*"],
+      },
+    });
 
+    // Teams endpoint
+    const teamsEndpoint = api.root.addResource("teams");
+    teamsEndpoint.addMethod(
+      "POST",
+      new apig.LambdaIntegration(createTeamFn, { proxy: true })
+    );
 
    
   }
