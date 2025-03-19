@@ -80,7 +80,18 @@
                 "titlesWon"
             ],
             "type": "object"
-        }
+        },
+            "PlayerQueryParams": {
+            "type": "object",
+            "properties": {
+                "teamId": { "type": "string" },
+                "position": { "type": "string" },
+                "isCaptain": { "type": "string", "enum": ["true", "false"] }
+            },
+            "required": ["teamId"],
+            "additionalProperties": false
+            }
+          }
     }
-}
+
 
