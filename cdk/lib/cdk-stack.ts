@@ -42,8 +42,24 @@ export class CdkStack extends cdk.Stack {
         REGION: "eu-west-1",
       },
     });
+
+    const getAllTeamsFn = new lambdanode.NodejsFunction(this, "GetAllTeamsFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_18_X,
+      entry: `${__dirname}/../lambdas/getAllTeams.ts`, 
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        TABLE_NAME: teamsTable.tableName,
+        REGION: "eu-west-1", 
+      },
+    });
+
+    //Access Grants
     teamsTable.grantReadWriteData(createTeamFn);
-    
+    teamsTable.grantReadData(getAllTeamsFn);
+
+
     // REST API 
     const api = new apig.RestApi(this, "TeamsApi", {
       description: "demo api",
@@ -63,6 +79,10 @@ export class CdkStack extends cdk.Stack {
     teamsEndpoint.addMethod(
       "POST",
       new apig.LambdaIntegration(createTeamFn, { proxy: true })
+    );
+    teamsEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getAllTeamsFn, { proxy: true })
     );
 
    
