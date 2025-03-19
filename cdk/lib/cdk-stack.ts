@@ -4,6 +4,9 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import * as apig from "aws-cdk-lib/aws-apigateway";
+import { teams } from "../seed/teams";
+import { generateBatch } from "../shared/util";
+import * as custom from "aws-cdk-lib/custom-resources";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -53,6 +56,22 @@ export class CdkStack extends cdk.Stack {
         TABLE_NAME: teamsTable.tableName,
         REGION: "eu-west-1", 
       },
+    });
+
+    new custom.AwsCustomResource(this, "TeamsDbInitData", {
+      onCreate: {
+        service: "DynamoDB",
+        action: "batchWriteItem",
+        parameters: {
+          RequestItems: {
+            [teamsTable.tableName]: generateBatch(teams),
+          },
+        },
+        physicalResourceId: custom.PhysicalResourceId.of("TeamsDbInitData"),
+      },
+      policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
+        resources: [teamsTable.tableArn],
+      }),
     });
 
     //Access Grants

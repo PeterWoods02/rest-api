@@ -31,6 +31,6 @@
   "include": [
     "lib/**/*.ts",
     "lambdas/**/*.ts",
-    "shared/**/*.json"
+    "shared/*.json"
   ],
 }

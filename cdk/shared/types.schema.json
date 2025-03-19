@@ -1,18 +1,50 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
-      "Team": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "number" },
-          "teamName": { "type": "string" },
-          "country": { "type": "string" },
-          "league": { "type": "string" },
-          "location": { "type": "string" }
-        },
-        "required": ["id", "teamName", "country", "league", "location"],
-        "additionalProperties": false
-      }
+        "Team": {
+            "additionalProperties": false,
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "founded": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "league": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "stadium": {
+                    "type": "string"
+                },
+                "teamName": {
+                    "type": "string"
+                },
+                "titlesWon": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "country",
+                "founded",
+                "id",
+                "isActive",
+                "league",
+                "location",
+                "stadium",
+                "teamName",
+                "titlesWon"
+            ],
+            "type": "object"
+        }
     }
-  }
-  
+}
+
