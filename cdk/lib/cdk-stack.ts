@@ -58,6 +58,19 @@ export class CdkStack extends cdk.Stack {
       },
     });
 
+    const getTeamByIdFn = new lambdanode.NodejsFunction(this, "GetTeamByIdFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_18_X,
+      entry: `${__dirname}/../lambdas/getTeamById.ts`,
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        TABLE_NAME: teamsTable.tableName,
+        //PLAYERS_TABLE_NAME: playersTable.tableName, 
+        REGION: "eu-west-1",
+      },
+    });
+
     new custom.AwsCustomResource(this, "TeamsDbInitData", {
       onCreate: {
         service: "DynamoDB",
@@ -77,6 +90,8 @@ export class CdkStack extends cdk.Stack {
     //Access Grants
     teamsTable.grantReadWriteData(createTeamFn);
     teamsTable.grantReadData(getAllTeamsFn);
+    teamsTable.grantReadData(getTeamByIdFn);
+    //playersTable.grantReadData(getTeamByIdFn);
 
 
     // REST API 
@@ -102,6 +117,11 @@ export class CdkStack extends cdk.Stack {
     teamsEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getAllTeamsFn, { proxy: true })
+    );
+    const specificTeamEndpoint = teamsEndpoint.addResource("{teamId}");
+    specificTeamEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getTeamByIdFn, { proxy: true })
     );
 
    
