@@ -1,4 +1,4 @@
-import { Team } from "../shared/types";
+import { Team, Player } from "../shared/types";
 
 export const teams: Team[] = [
   {
@@ -110,5 +110,62 @@ export const teams: Team[] = [
     stadium: "Errigal Park",
     titlesWon: 6,
     isActive: true,
+  }
+];
+
+export const players: Player[] = [
+  {
+    teamId: "1",  
+    playerId: "1",
+    name: "Liam O'Brien",
+    position: "Goalkeeper",
+    nationality: "Ireland",
+    age: 30,
+    isCaptain: false,
+  },
+  {
+    teamId: "1",
+    playerId: "2",
+    name: "Conor McCarthy",
+    position: "Defender",
+    nationality: "Ireland",
+    age: 27,
+    isCaptain: true,
+  },
+  {
+    teamId: "2",  
+    playerId: "1",
+    name: "Eoin Murphy",
+    position: "Forward",
+    nationality: "Ireland",
+    age: 24,
+    isCaptain: true,
+  },
+  {
+    teamId: "2",
+    playerId: "2",
+    name: "Sean Doyle",
+    position: "Midfielder",
+    nationality: "Ireland",
+    age: 25,
+    isCaptain: false,
+  },
+  {
+    teamId: "3",  
+    playerId: "1",
+    name: "Patrick Kelly",
+    position: "Defender",
+    nationality: "Ireland",
+    age: 28,
+    isCaptain: true,
+  },
+  {
+    teamId: "3",
+    playerId: "2",
+    name: "Aiden Byrne",
+    position: "Goalkeeper",
+    nationality: "Ireland",
+    age: 31,
+    isCaptain: false,
   }
 ];

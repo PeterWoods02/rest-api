@@ -1,6 +1,42 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "Player": {
+            "additionalProperties": false,
+            "properties": {
+                "age": {
+                    "type": "number"
+                },
+                "isCaptain": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nationality": {
+                    "type": "string"
+                },
+                "playerId": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "teamId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "age",
+                "isCaptain",
+                "name",
+                "nationality",
+                "playerId",
+                "position",
+                "teamId"
+            ],
+            "type": "object"
+        },
         "Team": {
             "additionalProperties": false,
             "properties": {

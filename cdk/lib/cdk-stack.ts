@@ -4,7 +4,7 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import * as apig from "aws-cdk-lib/aws-apigateway";
-import { teams } from "../seed/teams";
+import { teams, players } from "../seed/teams";
 import { generateBatch } from "../shared/util";
 import * as custom from "aws-cdk-lib/custom-resources";
 
@@ -66,7 +66,7 @@ export class CdkStack extends cdk.Stack {
       memorySize: 128,
       environment: {
         TABLE_NAME: teamsTable.tableName,
-        //PLAYERS_TABLE_NAME: playersTable.tableName, 
+        PLAYERS_TABLE_NAME: playersTable.tableName, 
         REGION: "eu-west-1",
       },
     });
@@ -78,12 +78,13 @@ export class CdkStack extends cdk.Stack {
         parameters: {
           RequestItems: {
             [teamsTable.tableName]: generateBatch(teams),
+            [playersTable.tableName]: generateBatch(players)
           },
         },
         physicalResourceId: custom.PhysicalResourceId.of("TeamsDbInitData"),
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [teamsTable.tableArn],
+        resources: [teamsTable.tableArn, playersTable.tableArn],
       }),
     });
 
@@ -91,7 +92,7 @@ export class CdkStack extends cdk.Stack {
     teamsTable.grantReadWriteData(createTeamFn);
     teamsTable.grantReadData(getAllTeamsFn);
     teamsTable.grantReadData(getTeamByIdFn);
-    //playersTable.grantReadData(getTeamByIdFn);
+    playersTable.grantReadData(getTeamByIdFn);
 
 
     // REST API 

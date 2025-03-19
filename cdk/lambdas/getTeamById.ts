@@ -10,7 +10,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     const pathParameters = event?.pathParameters;
     const teamId = pathParameters?.teamId ? parseInt(pathParameters.teamId) : undefined;
-    //const includePlayers = event?.queryStringParameters?.players === "true";
+    const includePlayers = event?.queryStringParameters?.players === "true";
 
     if (!teamId) {
       return {
@@ -36,7 +36,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
 
-    /* Will uncomment when Players fully implemented
+    
     let players: Record<string, any>[] | null = null;
     if (includePlayers) {
       const playersTableName = process.env.PLAYERS_TABLE_NAME;
@@ -55,7 +55,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         console.warn("PLAYERS_TABLE_NAME environment variable is not set.");
       }
     }
-*/
+
     // Build response
     const response = {
       id: teamResult.Item.id,
@@ -66,8 +66,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       founded: teamResult.Item.founded,
       stadium: teamResult.Item.stadium,
       titlesWon: teamResult.Item.titlesWon,
-      isActive: teamResult.Item.isActive
-      //players: players || null,
+      isActive: teamResult.Item.isActive,
+      players: players || null,
     };
 
     return {

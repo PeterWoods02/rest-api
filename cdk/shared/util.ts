@@ -1,16 +1,18 @@
 import { marshall } from "@aws-sdk/util-dynamodb";
-import { Team } from "./types";
+import { Team, Player } from "./types";
 
-export const generateTeamItem = (team: Team) => {
+type Entity = Team | Player; 
+export const generateItem = (entity: Entity) => {
     return {
-        PutRequest: {
-            Item: marshall(team),
-        },
+      PutRequest: {
+        Item: marshall(entity),
+      },
     };
-};
-
-export const generateBatch = (data: Team[]) => {
+  };
+  
+  export const generateBatch = (data: Entity[]) => {
     return data.map((e) => {
-        return generateTeamItem(e);
+      return generateItem(e);
     });
-};
+  };
+  
