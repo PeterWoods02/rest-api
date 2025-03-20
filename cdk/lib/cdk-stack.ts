@@ -35,6 +35,14 @@ export class CdkStack extends cdk.Stack {
       sortKey: { name: "position", type: dynamodb.AttributeType.STRING },
     });
 
+    const translationsTable = new dynamodb.Table(this, "TranslationsTable", {
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      partitionKey: { name: "teamId", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "language", type: dynamodb.AttributeType.STRING },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+    
+
     const createTeamFn = new lambdanode.NodejsFunction(this, "CreateTeamFn", {
       architecture: lambda.Architecture.ARM_64,
       runtime: lambda.Runtime.NODEJS_18_X,
@@ -104,6 +112,7 @@ export class CdkStack extends cdk.Stack {
       memorySize: 128,
       environment: {
         TABLE_NAME: teamsTable.tableName,
+        CACHE_TABLE_NAME: translationsTable.tableName,
         REGION: "eu-west-1"
       }
     });
@@ -133,7 +142,8 @@ export class CdkStack extends cdk.Stack {
     playersTable.grantReadData(getTeamByIdFn);
     playersTable.grantReadData(getTeamPlayersFn);
     teamsTable.grantReadWriteData(updateTeamFn);
-    teamsTable.grantReadData(translateTeamFn);
+    teamsTable.grantReadWriteData(translateTeamFn);
+    translationsTable.grantReadWriteData(translateTeamFn);
     
 
     translateTeamFn.addToRolePolicy(
