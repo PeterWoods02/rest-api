@@ -159,11 +159,34 @@ export class CdkStack extends cdk.Stack {
       },
     });
 
+    // create api key
+    const apiKey = new apig.ApiKey(this, "TeamsAPIKey", {
+      apiKeyName: "Teams-API-Key",
+      description: "API key for Teams Management API",
+    });
+
+    // create usage plan
+    const usagePlan = new apig.UsagePlan(this, "TeamsAPIUsagePlan", {
+      name: "Teams Management API Usage Plan",
+      apiStages:[
+        {
+          api: api,
+          stage:  api.deploymentStage,
+        },
+      ],
+    });
+
+    usagePlan.addApiKey(apiKey);
+    
+
     // Teams endpoint
     const teamsEndpoint = api.root.addResource("teams");
     teamsEndpoint.addMethod(
       "POST",
-      new apig.LambdaIntegration(createTeamFn, { proxy: true })
+      new apig.LambdaIntegration(createTeamFn, { proxy: true }),
+      {
+        apiKeyRequired: true 
+      }
     );
     teamsEndpoint.addMethod(
       "GET",
@@ -177,7 +200,10 @@ export class CdkStack extends cdk.Stack {
     );
     specificTeamEndpoint.addMethod(
       "PUT",
-      new apig.LambdaIntegration(updateTeamFn, { proxy: true })
+      new apig.LambdaIntegration(updateTeamFn, { proxy: true }),
+      {
+        apiKeyRequired: true 
+      }
     );
 
     const playersEndpoint = api.root.addResource("players");
