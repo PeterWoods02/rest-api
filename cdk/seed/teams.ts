@@ -11,6 +11,7 @@ export const teams: Team[] = [
     stadium: "Aviva Arena",
     titlesWon: 12,
     isActive: true,
+    history: "Dublin Dynamos is a football team from Dublin. The team was founded in 1901. They have won 12 league titles. They are known for fast play and loyal fans."
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ export const teams: Team[] = [
     stadium: "Rebel Park",
     titlesWon: 7,
     isActive: true,
+    history: "Cork Cavaliers is a football team from Cork. The team started in 1920. They have won 7 league titles. They play at Rebel Park."
   },
   {
     id: 3,
@@ -33,6 +35,7 @@ export const teams: Team[] = [
     stadium: "Corrib Stadium",
     titlesWon: 3,
     isActive: true,
+    history: "Galway Gaels is a football club from Galway. The team was founded in 1935. They have won 3 league titles. Their home stadium is Corrib Stadium."
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ export const teams: Team[] = [
     stadium: "Shannon Grounds",
     titlesWon: 5,
     isActive: false,
+    history: "Limerick Legends was founded in 1948. They have won 5 league titles. They play in Shannon Grounds. The team is not active now."
   },
   {
     id: 5,
@@ -55,6 +59,7 @@ export const teams: Team[] = [
     stadium: "Titan Park",
     titlesWon: 14,
     isActive: true,
+    history: "Belfast Titans is a football team from Belfast. They started in 1890. They have won 14 league titles. Titan Park is their home."
   },
   {
     id: 6,
@@ -66,6 +71,7 @@ export const teams: Team[] = [
     stadium: "Crystal Stadium",
     titlesWon: 4,
     isActive: true,
+    history: "Waterford Waves is a team from Waterford. They were founded in 1955. They have won 4 league titles. Their home stadium is Crystal Stadium."
   },
   {
     id: 7,
@@ -77,6 +83,7 @@ export const teams: Team[] = [
     stadium: "Marble City Grounds",
     titlesWon: 2,
     isActive: false,
+    history: "Kilkenny Kings is a football team from Kilkenny. The team was started in 1970. They have won 2 league titles. They are not active now."
   },
   {
     id: 8,
@@ -88,6 +95,7 @@ export const teams: Team[] = [
     stadium: "Wild Atlantic Stadium",
     titlesWon: 1,
     isActive: true,
+    history: "Sligo Storm is a football team from Sligo. They were founded in 1985. They have won 1 league title. Their home is Wild Atlantic Stadium."
   },
   {
     id: 9,
@@ -99,6 +107,7 @@ export const teams: Team[] = [
     stadium: "Clew Bay Stadium",
     titlesWon: 3,
     isActive: false,
+    history: "Mayo Mariners is a football team from Castlebar. The team started in 1965. They have won 3 league titles. They are not active now."
   },
   {
     id: 10,
@@ -110,8 +119,10 @@ export const teams: Team[] = [
     stadium: "Errigal Park",
     titlesWon: 6,
     isActive: true,
+    history: "Donegal Druids is a football team from Letterkenny. They were founded in 1930. They have won 6 league titles. They play at Errigal Park."
   }
 ];
+
 
 export const players: Player[] = [
   {

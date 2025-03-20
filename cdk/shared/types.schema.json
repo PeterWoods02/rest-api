@@ -66,6 +66,9 @@
                 },
                 "titlesWon": {
                     "type": "number"
+                },
+                "history": {
+                    "type": "number"
                 }
             },
             "required": [
@@ -77,7 +80,8 @@
                 "location",
                 "stadium",
                 "teamName",
-                "titlesWon"
+                "titlesWon",
+                "history"
             ],
             "type": "object"
         },
