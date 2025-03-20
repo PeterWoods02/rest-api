@@ -7,6 +7,7 @@ import * as apig from "aws-cdk-lib/aws-apigateway";
 import { teams, players } from "../seed/teams";
 import { generateBatch } from "../shared/util";
 import * as custom from "aws-cdk-lib/custom-resources";
+import * as iam from "aws-cdk-lib/aws-iam";
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -94,6 +95,18 @@ export class CdkStack extends cdk.Stack {
         REGION: "eu-west-1",
       },
     });
+
+    const translateTeamFn = new lambdanode.NodejsFunction(this, "TranslateTeamFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_18_X,
+      entry: `${__dirname}/../lambdas/translateTeam.ts`,
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        TABLE_NAME: teamsTable.tableName,
+        REGION: "eu-west-1"
+      }
+    });
     
 
     new custom.AwsCustomResource(this, "TeamsDbInitData", {
@@ -120,7 +133,16 @@ export class CdkStack extends cdk.Stack {
     playersTable.grantReadData(getTeamByIdFn);
     playersTable.grantReadData(getTeamPlayersFn);
     teamsTable.grantReadWriteData(updateTeamFn);
+    teamsTable.grantReadData(translateTeamFn);
+    
 
+    translateTeamFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["translate:TranslateText"],
+        resources: ["*"]
+      })
+    );
 
 
     // REST API 
@@ -162,6 +184,12 @@ export class CdkStack extends cdk.Stack {
     playersEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getTeamPlayersFn, { proxy: true })
+    );
+
+    const translateEndpoint = specificTeamEndpoint.addResource("translate");
+    translateEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(translateTeamFn, { proxy: true })
     );
 
    

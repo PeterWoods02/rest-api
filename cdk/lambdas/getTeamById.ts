@@ -67,6 +67,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       stadium: teamResult.Item.stadium,
       titlesWon: teamResult.Item.titlesWon,
       isActive: teamResult.Item.isActive,
+      history: teamResult.Item.history,
       players: players || null,
     };
 
