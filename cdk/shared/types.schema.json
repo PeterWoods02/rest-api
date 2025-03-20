@@ -68,7 +68,7 @@
                     "type": "number"
                 },
                 "history": {
-                    "type": "number"
+                    "type": "string"
                 }
             },
             "required": [
