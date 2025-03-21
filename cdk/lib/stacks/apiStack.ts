@@ -100,13 +100,19 @@ export class ApiStack extends cdk.Stack {
     });
 
     // Translate GET
-    new ApiConstructor(this, 'TranslateTeam', {
+    const translateTeam = new ApiConstructor(this, 'TranslateTeam', {
       api,
       path: 'teams/{teamId}/translate',
       method: 'GET',
       table: props.databaseStack.teamsTable,
       lambdaEntry: `${__dirname}/../../lambdas/translateTeam.ts`,
       attachTranslatePolicy: true,
+      additionalEnv: {
+        TABLE_NAME: props.databaseStack.teamsTable.tableName,
+        CACHE_TABLE_NAME: props.databaseStack.translationsCacheTable.tableName,
+      },
     });
+    props.databaseStack.translationsCacheTable.grantReadWriteData(translateTeam.lambdaFn);
+
   }
 }

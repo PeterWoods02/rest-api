@@ -9,6 +9,7 @@ import { Construct } from 'constructs';
 export class DatabaseStack extends cdk.Stack {
   public readonly teamsTable: dynamodb.Table;
   public readonly playersTable: dynamodb.Table;
+  public readonly translationsCacheTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -33,6 +34,14 @@ export class DatabaseStack extends cdk.Stack {
       sortKey: { name: 'position', type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL
     });
+
+    this.translationsCacheTable = new dynamodb.Table(this, 'TranslationsCacheTable', {
+      partitionKey: { name: 'teamId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'language', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+    
     
     new custom.AwsCustomResource(this, 'TeamsDbInitData', {
       onCreate: {
