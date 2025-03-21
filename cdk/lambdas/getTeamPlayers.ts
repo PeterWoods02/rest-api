@@ -19,9 +19,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
     console.log("[EVENT]", JSON.stringify(event));
 
-    const queryParams = event.queryStringParameters;
+    const queryParams = event.queryStringParameters || {};
 
-    if (!queryParams || !queryParams.teamId) {
+    if (!queryParams.teamId) {
       return {
         statusCode: 400,
         headers: { "content-type": "application/json" },
@@ -43,44 +43,50 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const teamId = queryParams.teamId;
     const position = queryParams.position;
     const isCaptain = queryParams.isCaptain;
+    const players = queryParams.players;
+
+    if (players === "false") {
+      return {
+        statusCode: 200,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          data: [],
+        }),
+      };
+    }
 
     let commandInput: QueryCommandInput = {
-        TableName: process.env.PLAYERS_TABLE_NAME,
-        KeyConditionExpression: "teamId = :teamId",
-        ExpressionAttributeValues: {
-          ":teamId": teamId,
-        },
-      };
+      TableName: process.env.PLAYERS_TABLE_NAME,
+      KeyConditionExpression: "teamId = :teamId",
+      ExpressionAttributeValues: {
+        ":teamId": teamId,
+      },
+    };
 
-    if (position) {
-        commandInput = {
-          TableName: process.env.PLAYERS_TABLE_NAME,
-          IndexName: "positionIx",
-          KeyConditionExpression: "teamId = :teamId AND begins_with(#pos, :pos)",
-          ExpressionAttributeNames: {
-            "#pos": "position"
-          },
-          ExpressionAttributeValues: {
-            ":teamId": teamId,
-            ":pos": position
-          }
-        };
-      } 
-        
+    let expressionAttributeNames: Record<string, string> = {};
+    let expressionAttributeValues: Record<string, any> = {
+      ":teamId": teamId,
+    };
+
     
+    if (position) {
+      commandInput.IndexName = "positionIx"; 
+      commandInput.KeyConditionExpression = "teamId = :teamId AND position = :pos";
+      expressionAttributeValues[":pos"] = position;
+    }
     if (typeof isCaptain !== "undefined") {
-        const isCaptainBoolean = isCaptain === "true"; 
-        
-        commandInput.FilterExpression = "#isCaptain = :isCaptain";
-        commandInput.ExpressionAttributeNames = {
-          ...(commandInput.ExpressionAttributeNames || {}),
-          "#isCaptain": "isCaptain",
-        };
-        commandInput.ExpressionAttributeValues = {
-          ...(commandInput.ExpressionAttributeValues || {}),
-          ":isCaptain": isCaptainBoolean,
-        };
-      }
+      const isCaptainBoolean = isCaptain === "true";
+      commandInput.FilterExpression = "#isCaptain = :isCaptain";
+      expressionAttributeNames["#isCaptain"] = "isCaptain";
+      expressionAttributeValues[":isCaptain"] = isCaptainBoolean;
+    }
+
+    if (Object.keys(expressionAttributeNames).length > 0) {
+      commandInput.ExpressionAttributeNames = expressionAttributeNames;
+    }
+
+    commandInput.ExpressionAttributeValues = expressionAttributeValues;
+
 
     const commandOutput = await ddbDocClient.send(
       new QueryCommand(commandInput)
@@ -90,7 +96,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       statusCode: 200,
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        data: commandOutput.Items,
+        data: commandOutput.Items || [],
       }),
     };
 

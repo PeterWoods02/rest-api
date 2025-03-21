@@ -25,14 +25,15 @@ export class DatabaseStack extends cdk.Stack {
       partitionKey: { name: 'teamId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'playerId', type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: 'players',
+      tableName: 'players'
     });
-
+    
     this.playersTable.addLocalSecondaryIndex({
       indexName: 'positionIx',
       sortKey: { name: 'position', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL
     });
-
+    
     new custom.AwsCustomResource(this, 'TeamsDbInitData', {
       onCreate: {
         service: 'DynamoDB',

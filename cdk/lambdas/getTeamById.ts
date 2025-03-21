@@ -10,7 +10,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     const pathParameters = event?.pathParameters;
     const teamId = pathParameters?.teamId ? parseInt(pathParameters.teamId) : undefined;
-    const includePlayers = event?.queryStringParameters?.players === "true";
+
+    const queryParams = event?.queryStringParameters || {};
+    const includePlayers = queryParams.players === "true";
+    const isCaptain = queryParams.isCaptain;
+    const position = queryParams.position;
 
     if (!teamId) {
       return {
@@ -22,7 +26,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     // Get team details
     const getTeamCommand = new GetCommand({
-      TableName: process.env.TABLE_NAME, 
+      TableName: process.env.TABLE_NAME,
       Key: { id: teamId },
     });
 
@@ -41,15 +45,39 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     if (includePlayers) {
       const playersTableName = process.env.PLAYERS_TABLE_NAME;
       if (playersTableName) {
-        const queryCommand = new QueryCommand({
+        let queryCommandParams: any = {
           TableName: playersTableName,
           KeyConditionExpression: "teamId = :teamId",
           ExpressionAttributeValues: {
-            ":teamId": teamId.toString(), 
+            ":teamId": teamId.toString(),
           },
-        });
+        };
+        let expressionAttributeNames: Record<string, string> = {};
+        let expressionAttributeValues: Record<string, any> = {
+          ":teamId": teamId.toString(),
+        };
+        
+        if (position) {
+          queryCommandParams.IndexName = "positionIx"; 
+          queryCommandParams.KeyConditionExpression = "teamId = :teamId AND #position = :position";
+          expressionAttributeNames["#position"] = "position";
+          expressionAttributeValues[":position"] = position;
+        }
+        if (typeof isCaptain !== "undefined") {
+          const isCaptainBoolean = isCaptain === "true";
+          queryCommandParams.FilterExpression = "#isCaptain = :isCaptain";
+          expressionAttributeNames["#isCaptain"] = "isCaptain";
+          expressionAttributeValues[":isCaptain"] = isCaptainBoolean;
+        }
 
-        const playersResult = await ddbDocClient.send(queryCommand);
+        if (Object.keys(expressionAttributeNames).length > 0) {
+          queryCommandParams.ExpressionAttributeNames = expressionAttributeNames;
+        }
+
+        queryCommandParams.ExpressionAttributeValues = expressionAttributeValues;
+        const playersResult = await ddbDocClient.send(
+          new QueryCommand(queryCommandParams)
+        );
         players = playersResult.Items || [];
       } else {
         console.warn("PLAYERS_TABLE_NAME environment variable is not set.");
