@@ -32,10 +32,8 @@ Player Table item attributes:
 + isCaptain - boolean
 
 ### App API endpoints.
-
-[ Provide a bullet-point list of the app's endpoints (excluding the Auth API) you have successfully implemented. ]
-e.g.
  
+
 + POST /teams - Create a new team
 + GET /teams - Get a list of all teams
 + GET /teams/{teamId} - Get a specific team by teamId
@@ -48,7 +46,7 @@ e.g.
 
 ### Features.
 
-#### Translation persistence (if completed)
+#### Translation persistence 
 
 Translated team histories are cached in DynamoDb table (translationsCacheTable). Before translation system checked the cache for existing translations. If history has changed cache is invalidated and retranslated
 
